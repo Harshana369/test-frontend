@@ -108,7 +108,6 @@
 // }
 
 
-// src/components/Navbar.tsx
 'use client';
 
 import Link from 'next/link';
@@ -119,17 +118,12 @@ import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getUser());
   const [mounted, setMounted] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Only access localStorage after component mounts (client-side)
-    const currentUser = getUser();
-    const authStatus = isAuthenticated();
-    setUser(currentUser);
-    setIsAuth(authStatus);
+    setUser(getUser());
   }, []);
 
   const handleLogout = async () => {
@@ -138,20 +132,16 @@ export default function Navbar() {
       setAuthToken(null);
       setUserState(null);
       setUser(null);
-      setIsAuth(false);
       router.push('/auth/login');
     } catch (err) {
       console.error('Logout failed:', err);
-      // Even if logout fails on server, clear local storage
       setAuthToken(null);
       setUserState(null);
       setUser(null);
-      setIsAuth(false);
       router.push('/auth/login');
     }
   };
 
-  // Prevent hydration mismatch by showing loading state
   if (!mounted) {
     return (
       <nav className="bg-blue-600 p-4">
@@ -179,7 +169,7 @@ export default function Navbar() {
           My Blog
         </Link>
         <div className="flex items-center space-x-4">
-          {isAuth && user ? (
+          {isAuthenticated() && user ? (
             <>
               <div className="text-white text-sm">
                 <div className="flex items-center space-x-2">
@@ -202,6 +192,18 @@ export default function Navbar() {
                   )}
                 </div>
               </div>
+              <Link href="/profile" className="text-white hover:text-gray-200">
+                Profile
+              </Link>
+              <Link href="/dashboard" className="text-white hover:text-gray-200">
+                Dashboard
+              </Link>
+              <Link href="/activity" className="text-white hover:text-gray-200">
+                Activity
+              </Link>
+              <Link href="/sessions" className="text-white hover:text-gray-200">
+                Sessions
+              </Link>
               <button
                 onClick={handleLogout}
                 className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm transition-colors"
